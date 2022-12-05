@@ -2,11 +2,21 @@
 from bit import PrivateKey as Key
 from tkinter import *
 from tkinter import ttk
+import serial.tools.list_ports
+import serial
+
 root = Tk()
 root.title("Bticoin Wallet")
 root.maxsize(1000, 400)
 root.minsize(400, 400)
 frm = ttk.Frame(root, padding=20)
+
+ports = serial.tools.list_ports.comports(include_links=False)
+'''
+s = serial.Serial(port="COM4", baudrate=9600)
+res = s.read()
+print(res)
+'''
 state = StringVar()
 state.set('Не подключенно')
 
@@ -15,18 +25,21 @@ def handle_click():
     state.set("Подключенно")
     print("Нажата кнопка!")
 
-languages = ["Python", "JavaScript", "C#", "Java"]
-languages_var = Variable(value=languages)
+def listbox_select(event):
+    selected_indices = listbox1.curselection()
+
+languages_var = Variable(value=ports)
 
 frm.grid()
-ttk.Label(frm, text="ВВедите пин").grid(column=0, row=0)
-ttk.Label(frm, text="Состояние:").grid(column=4, row=0)
-ttk.Label(frm, textvariable=state).grid(column=5, row=0)
-ttk.Button(frm, text="Подключится", command=handle_click).grid(column=4, row=2)
+#ttk.Label(frm, text="ВВедите пин").grid(column=0, row=0)
+ttk.Label(frm, text="Состояние:").grid(column=1, row=0)
+ttk.Label(frm, textvariable=state).grid(column=2, row=0)
+ttk.Button(frm, text="Подключится", command=handle_click).grid(column=2, row=4)
 ttk.Button(frm, text="Quit", command=root.destroy).grid(column=4, row=6)
-button = Button(frm, text="Кликни!", command=handle_click).grid(column=0, row=3)
+#button = Button(frm, text="Кликни!", command=handle_click).grid(column=0, row=3)
  
 listbox1=Listbox(frm,height=5,width=15, listvariable=languages_var, selectmode=EXTENDED).grid(column=2, row=3)
+listbox1.bind("<<ListboxSelect>>", listbox_select)
 
 enter_pin = Entry( width=5).grid(column=1, row=0)
 print(enter_pin)
