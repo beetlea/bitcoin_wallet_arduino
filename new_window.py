@@ -58,6 +58,7 @@ def handle_click():
         state.set("Не удалось подключится")
     else:
         s.timeout(1)
+        s.writelines(str.encode("START"))
         data = s.readline(2)
         if len(data) != 0:
             state.set("Подключенно")
@@ -73,16 +74,29 @@ def pin_handler():
     pin = enter_pin.get()
     print(pin)
     try:
-        s.writelines(str.encode(pin))
+        s.writelines(str.encode("PIN" + pin))
     except:
         current_state_label["text"] = "Не удалось подключится"
         return 
 
-    data = s.readline(2)
+    data = s.readline(100)
     if len(data) != 0:
         state.set("Подключенно")
+        current_state_label["text"] = "Кошелек загружен"
+
+        private_key_wallet = data.decode("utf-8")
+        update_balance()
+        if var_net.get() == 0:
+            k = bit.PrivateKeyTestnet(private_key_wallet)
+        else:
+            k = Key(private_key_wallet)
+        public_addres_wallet = k.address
+        
+        public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
+        private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
     else:
         state.set("Устройство не отвечает")
+        current_state_label["text"] = "Не верный ПИН"
 
 
 def selected(event):
@@ -153,7 +167,7 @@ def recieve_money():
     recieve = Tk()
 
     public_text_wallet = Text(recieve, height=1, borderwidth=0)
-    public_text_wallet.insert(1.0, "Публичный номер кошелька " + str(public_addres_wallet))
+    public_text_wallet.insert(1.0, str(public_addres_wallet))
     public_text_wallet.pack()
 
 def get_private_key():
@@ -162,7 +176,7 @@ def get_private_key():
     recieve = Tk()
 
     public_text_wallet = Text(recieve, height=1, borderwidth=0)
-    public_text_wallet.insert(1.0, "Приватный номер кошелька " + str(private_key_wallet))
+    public_text_wallet.insert(1.0,  str(private_key_wallet))
     public_text_wallet.pack()
     
 def erase_wallet():
