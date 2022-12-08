@@ -55,11 +55,13 @@ def handle_click():
     try:
         s = serial.Serial(port=connect_port, baudrate=115200)
     except:
+        s.close()
         state.set("Не удалось подключится")
     else:
-        s.timeout(1)
+        s.timeout = 1
         s.writelines(str.encode("START"))
         data = s.readline(2)
+        print(data)
         if len(data) != 0:
             state.set("Подключенно")
         else:
@@ -74,7 +76,7 @@ def pin_handler():
     pin = enter_pin.get()
     print(pin)
     try:
-        s.writelines(str.encode("PIN" + pin))
+        s.writelines(str.encode("GET" + pin))
     except:
         current_state_label["text"] = "Не удалось подключится"
         return 
@@ -190,8 +192,7 @@ def erase_wallet():
 def save_wallet():
     global s, private_key_wallet, current_state_label
     try:
-        s.writelines(str.encode("SAVE"))
-        s.writelines(str.encode(private_key_wallet))
+        s.writelines(str.encode("SAVE" + private_key_wallet))
     except:
         current_state_label["text"] = "Не подключенно!"
         return

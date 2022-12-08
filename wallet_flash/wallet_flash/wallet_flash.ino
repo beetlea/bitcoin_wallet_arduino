@@ -1,9 +1,9 @@
 #include <SSD1306Wire.h>
 #include <tinyECC.h>
+#include "FS.h"   
 
 tinyECC ecc;
 SSD1306Wire display(0x3c, 5, 4); // SDA - IO5 (D1), SCL - IO4 (D2) 
-File file;
 
 
 
@@ -29,15 +29,22 @@ void setup() {
   display.init(); //  Инициализируем дисплей
   display.flipScreenVertically(); // Устанавливаем зеркальное отображение экрана, к примеру, удобно, если вы хотите желтую область сделать вверху
   start_screen();
-  delay(2000);
+  ///delay(2000);
 
   if(!SPIFFS.begin()){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
  }
-
-  file= SPIFFS.open("/key.txt", "r");
-  if(file){
+  if(!SPIFFS.exists("/key.txt"))
+  {
+    File file= SPIFFS.open("/key.txt", "w");
+    file.close();
+    key = 1;
+  }
+  else
+  {
+    File file= SPIFFS.open("/key.txt", "r");
+    file.close();
     key = 1;
   }
  
@@ -49,7 +56,7 @@ void loop() {
   {
     delay(10);
     
-    String data_input = Serial.readline();
+    String data_input = Serial.readString();
 
     if(data_input.indexOf("START") > -1)
     {
@@ -58,31 +65,48 @@ void loop() {
 
 
     
-    if(data_input.indexOf("PIN") > -1)
+    if(data_input.indexOf("GET") > -1)
     {
-      data_input.remove(0,3);
-      pin = data_input.toInt();
-      Serial.println("wallet_ok");
+        String String_file;
+        File file= SPIFFS.open("/key.txt", "r");
+        if(file.size() > 0)
+        {
+          while (file.available()) {
+            String_file.concat((char)file.read());
+          }
+          file.close();
+          ecc.plaintext= F("");
 
-      if(key == 1)
-      {
-        ecc.plaintext = F(file.readline());
-        ecc.decrypt();
-        ecc.ciphertext = F("");
-        Serial.println(ecc.plaintext); 
+          ecc.ciphertext = String_file;
+          ecc.decrypt();
+          ecc.ciphertext = F("");
+          Serial.print(ecc.plaintext);
+        } 
+        else
+        {
+          Serial.println("EMPTY");
       }
-      else
-      {
-        Serial.println(0);
-      }
+
     }
 
 
 
     if((data_input.indexOf("SAVE") > -1))
     {
-      ecc.plaintext= data_input.remove(0,4);
+      data_input.remove(0,4);
+      ecc.plaintext= data_input;
+      
       ecc.encrypt();
+      File file= SPIFFS.open("/key.txt", "w");
+
+      String String_save;
+      for(int i = 0; i < ecc.ciphertext.length(); i++)
+      {
+        String_save.concat(ecc.ciphertext[i]);
+      }
+      
+      file.print(ecc.ciphertext);
+      file.close();
       Serial.println("wallet_ok");
     }
   }
