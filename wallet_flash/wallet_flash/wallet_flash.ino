@@ -2,35 +2,57 @@
 #include <tinyECC.h>
 #include "FS.h"   
 
-tinyECC ecc;
+
 SSD1306Wire display(0x3c, 5, 4); // SDA - IO5 (D1), SCL - IO4 (D2) 
 
 
-
+void turn_on()
+{
+  display.clear(); 
+  display.setFont(ArialMT_Plain_24); 
+  display.drawString(0, 20, "TURN ON");
+  display.display(); 
+}
 
 void start_screen()
 {
-  display.clear(); // Очищаем экран
-  
-  display.drawRect(102, 2, 20, 8); // Пустой прямоугольник
-  display.fillRect(104, 4, 4, 4); // Заполненный прямоугольник
-  display.fillRect(110, 4, 4, 4); // Заполненный прямоугольник
-  display.fillRect(116, 4, 4, 4); // Заполненный прямоугольник
-  
-  display.drawHorizontalLine(0, 14, 128); // Горизонтальная линия
-  
-  display.setFont(ArialMT_Plain_24); // Шрифт кегль 24
-  display.drawString(0, 40, "START WALLET");
-  display.display(); // Выводим на экран
+  display.clear(); 
+  display.setFont(ArialMT_Plain_24); 
+  display.drawString(0, 20, "START");
+  display.display(); 
 }
+void erase()
+{
+  display.clear(); 
+  display.setFont(ArialMT_Plain_24); 
+  display.drawString(0, 20, "CLEAR");
+  display.display(); 
+}
+
+void save_key()
+{
+  display.clear(); 
+  display.setFont(ArialMT_Plain_24); 
+  display.drawString(0, 20, "SAVE");
+  display.display(); 
+}
+
+void load_key()
+{
+  display.clear(); 
+  display.setFont(ArialMT_Plain_24); 
+  display.drawString(0, 20, "LOAD");
+  display.display(); 
+}
+
+
 int key = 0;
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   display.init(); //  Инициализируем дисплей
   display.flipScreenVertically(); // Устанавливаем зеркальное отображение экрана, к примеру, удобно, если вы хотите желтую область сделать вверху
-  start_screen();
   ///delay(2000);
-
+  turn_on();
   if(!SPIFFS.begin()){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
@@ -41,13 +63,6 @@ void setup() {
     file.close();
     key = 1;
   }
-  else
-  {
-    File file= SPIFFS.open("/key.txt", "r");
-    file.close();
-    key = 1;
-  }
- 
 }
 
 int pin = 0;
@@ -61,6 +76,7 @@ void loop() {
     if(data_input.indexOf("START") > -1)
     {
       Serial.println("wallet_ok");
+      start_screen();
     }
 
 
@@ -75,12 +91,9 @@ void loop() {
             String_file.concat((char)file.read());
           }
           file.close();
-          ecc.plaintext= F("");
 
-          ecc.ciphertext = String_file;
-          ecc.decrypt();
-          ecc.ciphertext = F("");
-          Serial.print(ecc.plaintext);
+          Serial.println(String_file);
+          load_key();
         } 
         else
         {
@@ -94,20 +107,19 @@ void loop() {
     if((data_input.indexOf("SAVE") > -1))
     {
       data_input.remove(0,4);
-      ecc.plaintext= data_input;
-      
-      ecc.encrypt();
       File file= SPIFFS.open("/key.txt", "w");
-
-      String String_save;
-      for(int i = 0; i < ecc.ciphertext.length(); i++)
-      {
-        String_save.concat(ecc.ciphertext[i]);
-      }
-      
-      file.print(ecc.ciphertext);
+      file.print(data_input);
       file.close();
       Serial.println("wallet_ok");
+      save_key();
+    }
+
+    if((data_input.indexOf("ERASE_ALL") > -1))
+    {
+      File file= SPIFFS.open("/key.txt", "w");
+      file.close();
+      Serial.println("wallet_ok");
+      erase();
     }
   }
 }
