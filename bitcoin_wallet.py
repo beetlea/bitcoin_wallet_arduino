@@ -50,6 +50,8 @@ wallet_state_label = 0
 newWindow = 0
 newWallet = 0
 
+lang_var = 0
+
 var_net=IntVar()
 var_net.set(0)
 
@@ -139,7 +141,7 @@ def selected(event):
     connect_port = selected_langs
 
 def send_money():
-    global public_addres_wallet, private_key_wallet, var_net
+    global public_addres_wallet, private_key_wallet, var_net, lang_var
     global wallet_entry, wallet_sum_entry, wallet_info_label, wallet_state_label, newWindow
 
     wallet_state_label["text"] = "" 
@@ -160,31 +162,47 @@ def send_money():
         ])
     except:
         print("wrong transaction")
-        wallet_state_label["text"] = "Транзакция не прошла" 
+        if lang_var == 0:
+            wallet_state_label["text"] = "Транзакция не прошла" 
+        else:
+            wallet_state_label["text"] = "Wrong transaction" 
     else:
-        wallet_state_label["text"] = "Транзакция прошла. \n " + str(r)
+        if lang_var == 0:
+            wallet_state_label["text"] = "Транзакция прошла. \n " + str(r)
+        else:
+            wallet_state_label["text"] = "Success. \n " + str(r)
         print(r)  # ID транзакции
         update_balance()
 
 
 def transmit_money():
-    global wallet_entry, wallet_sum_entry, wallet_info_label, wallet_state_label, newWindow
+    global wallet_entry, wallet_sum_entry, wallet_info_label, wallet_state_label, newWindow, lang_var
     newWindow = Tk()
 
-    my_wallet_label = ttk.Label(newWindow, text = "Номер вашего кошелька " +str( public_addres_wallet))
+    if lang_var == 0:
+        number = "Номер вашего кошелька "
+        number_reciever = "Номер кошелька назначение"
+        summa = "Сумма"
+        but = "Отправить"
+    else:
+        number = "Your wallet "
+        number_reciever = "Destination wallet"
+        summa = "Amount"
+        but = "Send"
+    my_wallet_label = ttk.Label(newWindow, text = number +str( public_addres_wallet))
     my_wallet_label.pack()
 
-    wallet_info_label = ttk.Label(newWindow, text = "Номер кошелька назначение")
+    wallet_info_label = ttk.Label(newWindow, text = number_reciever)
     wallet_info_label.pack()
     wallet_entry = Entry( master = newWindow, width=50)
     wallet_entry.pack()
 
-    wallet_sum_label = ttk.Label(newWindow, text = "Сумма")
+    wallet_sum_label = ttk.Label(newWindow, text = summa)
     wallet_sum_label.pack()
     wallet_sum_entry = Entry( master = newWindow, width=50)
     wallet_sum_entry.pack()
 
-    wallet_send_button = ttk.Button(newWindow, text = "Отправить", command=send_money)
+    wallet_send_button = ttk.Button(newWindow, text = but, command=send_money)
     wallet_send_button.pack(padx=5, pady=20)
 
     wallet_state_label = ttk.Label(newWindow)
@@ -209,20 +227,26 @@ def get_private_key():
     public_text_wallet.pack()
     
 def erase_wallet():
-    global s, current_state_label
+    global s, current_state_label, lang_var
     s.flushInput()
     s.flushOutput()
     try:
         s.write(str.encode("ERASE_ALL"))
     except:
-        current_state_label["text"] = "Не подключенно!"
+        if lang_var == 0:
+            current_state_label["text"] = "Не подключенно!"
+        else:
+            current_state_label["text"] = "Disconnect"
         return
     s.timeout = 5
     s.flushInput()
     s.flushOutput()
     data = s.readline(200)
     if len(data) != 0:
-        state.set("Кошклек очищен")
+        if lang_var == 0:
+            state.set("Кошелек очищен")
+        else:
+            state.set("Wallet clear")
 
 def save_wallet():
     global s, private_key_wallet, current_state_label
@@ -319,6 +343,53 @@ def update_balance():
     th = Thread(target=update_balance_thread, args=())
     th.start()
 
+def lang_click():
+    global lang_var
+    
+    if lang_var == 0:
+        lang_var = 1
+        state_label["text"] = "State"
+        vary_blockcahain_label["text"] = "Set blockchain"
+        lang_button.config(text="Русский")  
+        rad0.config(text="Test")
+        rad1.config(text="True")
+        public_key_label["text"] = "Public key "
+        private_key_label["text"] = "Private key "
+        connect_button.config(text="Connect")
+        balance_label["text"] = "Balance"
+        update_balance_button.config(text="Update balance")
+        pin_label["text"] = "Enter PIN"
+        pin_button.config(text="Load wallet")
+        transmit_money_button.config(text="Send money")
+        recieve_money_button.config(text="Get public key")
+        recieve_private_button.config(text="Get private key")
+        creat_wallet_button.config(text="Create wallet")
+        add_wallet_button.config(text="Add wallet")
+        erase_wallet_button.config(text="Erase wallet")
+        save_wallet_button.config(text="Save wallet")
+        button_exit.config(text="Exit")
+    else:
+        lang_var = 0
+        state_label["text"] = "Состояние"
+        vary_blockcahain_label["text"] = "Выбор сети"
+        lang_button.config(text="English")
+        rad0.config(text="Тестовая")
+        rad1.config(text="Настоящая")
+        public_key_label["text"] = "Публичный номер кошелька "
+        private_key_label["text"] = "Приватный ключ кошелька "
+        connect_button.config(text="Подключится")
+        balance_label["text"] = "Баланс"
+        update_balance_button.config(text="Обновить баланс")
+        pin_label["text"] = "Введите ПИН"
+        pin_button.config(text="Загрузить кошелек")
+        transmit_money_button.config(text="Перевести")
+        recieve_money_button.config(text="Получить публичный ключ")
+        recieve_private_button.config(text="Получить приватный ключ")
+        creat_wallet_button.config(text="Создать кошелек")
+        add_wallet_button.config(text="Добавить кошелек")
+        erase_wallet_button.config(text="Удалить кошелек")
+        save_wallet_button.config(text="Сохранить кошелек")
+        button_exit.config(text="Выход")
 
 #ttk.Label(frm, text="ВВедите пин").grid(column=0, row=0)
 frame1 = ttk.Frame(master=root, width=300, height=50,)
@@ -336,6 +407,10 @@ rad0.pack(anchor=NW, fill=Y, padx=5, pady=5)
 rad1 = Radiobutton(frame1, text="Настоящая", variable=var_net, value=1)
 rad1.pack(anchor=NW, fill=Y, padx=5, pady=5)
 
+lang_label = ttk.Label(master = frame1, text="Language:")
+lang_label.pack(anchor=NW, fill=Y, padx=5, pady=5)
+lang_button = ttk.Button(frame1, text="English", command=lang_click)
+lang_button.pack(anchor=NW, fill=X, padx=5, pady=5)
 
 frame5 = ttk.Frame(master=root)
 frame5.pack(fill=X, side=BOTTOM)

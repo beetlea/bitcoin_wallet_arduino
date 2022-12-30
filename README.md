@@ -1,6 +1,7 @@
 <h1>Crypto wallet for BITCOIN coins on Arsduino esp8266</h1>
 <b>With settings: protection, private key storage and more.</b>
 <br>
+<img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/IMG_1643.JPG">
 <br>
 Project purpose:
 The project is designed to generate an electronic wallet, encrypt the private wallet number and then store it on the Wemos D1 board. The project consists of four parts.
