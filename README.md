@@ -33,5 +33,5 @@ Watch straps 20mm
 3 Insert the board into the case. From the beginning, we insert the board into the black part of the case, then into the red one. If necessary, it can be fixed with thermal glue. We insert it so that the hole in the back of the case coincides with the USB socket of the board. In this case, the module cover is directed upwards
 <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/IMG_1637.JPG">
 
-4 Приклеиваем экран термопистолетом по четырем углам прямоугольника крышки. Вставляем гайки в нижние отверстия, подключаем к компьютеру прошиваем скетчем из папки wallet_flash. Присоединяем ремешки. Должно получится вот так:
+4 Glue the screen with a thermal gun at the four corners of the rectangle of the lid. We insert the nuts into the lower holes, connect them to the computer and stitch them with a sketch from the wallet_flash folder. Attach the straps. It should turn out like this:
 <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/IMG_1641.JPG">
