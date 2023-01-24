@@ -27,7 +27,7 @@ Watch straps 20mm
 1 Print the case on a 3D printer. We solder the wiring to the display.
 <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/IMG_1634.JPG" style="height=100px">
 
-2 Припаиваем дисплей к плате по следующей схеме:
+2 Solder the display to the board according to the following scheme:
 <img src="https://habrastorage.org/r/w1560/getpro/habr/upload_files/7f3/332/22c/7f333222cedb4956555a081aba9e29c9.png">
 
 3 Insert the board into the case. From the beginning, we insert the board into the black part of the case, then into the red one. If necessary, it can be fixed with thermal glue. We insert it so that the hole in the back of the case coincides with the USB socket of the board. In this case, the module cover is directed upwards
