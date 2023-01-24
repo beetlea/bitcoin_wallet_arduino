@@ -48,7 +48,7 @@ void load_key()
 int key = 0;
 void setup() {
   Serial.begin(9600);
-  Serial.setTimeout(50);
+  Serial.setTimeout(250);
   display.init(); 
   display.flipScreenVertically(); 
   ///delay(2000);

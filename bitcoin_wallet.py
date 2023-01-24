@@ -63,7 +63,10 @@ def handle_click():
         s = serial.Serial(port=connect_port, baudrate=9600,write_timeout=1, timeout=3)
     except:
         s.close()
-        state.set("Не удалось подключится")
+        if lang_var == 0:
+            state.set("Не удалось подключится")
+        else:
+            state.set("Dont connect")
     else:
         s.flushInput()
         s.flushOutput()
@@ -71,9 +74,15 @@ def handle_click():
         data = s.readline(200)
         print(data)
         if len(data) != 0:
-            state.set("Подключенно")
+            if lang_var == 0:
+                state.set("Подключенно")
+            else:
+                state.set("Connect")
         else:
-            state.set("Устройство не отвечает")
+            if lang_var == 0:
+                state.set("Устройство не отвечает")
+            else:
+                state.set("Device dont reply")
 
 
     #res = s.read()
@@ -85,7 +94,10 @@ def pin_handler():
     try:
         s.write(str.encode("GET\n"))
     except:
-        current_state_label["text"] = "Не удалось подключится"
+        if lang_var == 0:   
+            current_state_label["text"] = "Не удалось подключится"
+        else:
+            current_state_label["text"] = "Dont connect"
         return 
     s.timeout = 5
     s.flushInput()
@@ -93,15 +105,25 @@ def pin_handler():
     data = s.readline(200)
     if len(data) != 0:
         if str(data[:-2], "ascii") == "EMPTY":
-            state.set("Кошклек пуст")
+            if lang_var == 0:
+                state.set("Кошклек пуст")
+            else:
+                state.set("Wallet empty")
             private_key_wallet = 0
             public_addres_wallet = 0
-            public_key_label["text"] = "Публичный номер кошелька " + str(0) 
-            private_key_label["text"] =  "Приватный ключ кошелька " + str(0) 
+            if lang_var == 0:
+                public_key_label["text"] = "Публичный номер кошелька " + str(0) 
+                private_key_label["text"] =  "Приватный ключ кошелька " + str(0) 
+            else:
+                public_key_label["text"] = "Public wallet key " + str(0) 
+                private_key_label["text"] =  "Private wallet key " + str(0) 
             return
         print(data)
         state.set("Подключенно")
-        current_state_label["text"] = "Кошелек загружен"
+        if lang_var == 0:
+            current_state_label["text"] = "Кошелек загружен"
+        else:
+            current_state_label["text"] = "Wallet load"
         wallet = cryptocode.decrypt(str(data[:-2], "ascii"), str(pin))
         if wallet != False:
             private_key_wallet = wallet
@@ -109,8 +131,12 @@ def pin_handler():
             state.set("Не верный ПИН")
             private_key_wallet = 0
             public_addres_wallet = 0
-            public_key_label["text"] = "Публичный номер кошелька " + str(0) 
-            private_key_label["text"] =  "Приватный ключ кошелька " + str(0) 
+            if lang_var == 0:
+                public_key_label["text"] = "Публичный номер кошелька " + str(0) 
+                private_key_label["text"] =  "Приватный ключ кошелька " + str(0) 
+            else:
+                public_key_label["text"] = "Public wallet key " + str(0) 
+                private_key_label["text"] =  "Private wallet key " + str(0) 
             return
         print(private_key_wallet)
         update_balance()
@@ -125,12 +151,19 @@ def pin_handler():
         state.set("Кошелек загружен")
         update_balance()
         public_addres_wallet = k.address
-        
-        public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
-        private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
+        if lang_var == 0:
+            public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
+            private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
+        else:
+            public_key_label["text"] = "Public wallet key " + str(public_addres_wallet) 
+            private_key_label["text"] =  "Private wallet key " + str(private_key_wallet) 
     else:
-        state.set("Не верный ПИН")
-        current_state_label["text"] = "Не верный ПИН"
+        if lang_var == 0:
+            state.set("Не верный ПИН")
+            current_state_label["text"] = "Не верный ПИН"
+        else:
+            state.set("Incorrect PIN")
+            current_state_label["text"] = "Incorrect PIN"
 
 
 def selected(event):
@@ -258,14 +291,20 @@ def save_wallet():
     try:
         s.write(str.encode("SAVE" + str_encoded + "\r\n"))
     except:
-        current_state_label["text"] = "Не подключенно!"
+        if lang_var == 0:
+            current_state_label["text"] = "Не подключенно!"
+        else:
+            current_state_label["text"] = "Dont connect!"
         return
     s.timeout = 5
     s.flushInput()
     s.flushOutput()
     data = s.readline(200)
     if len(data) != 0:
-        state.set("Кошелек сохранен")
+        if lang_var == 0:
+            state.set("Кошелек сохранен")
+        else:
+            state.set("Wallet save")
         
 def set_new_wallet():
     global wallet_add_entry, private_key_wallet, public_addres_wallet, wallet_state_add_label, var_net, newWallet
@@ -279,15 +318,24 @@ def set_new_wallet():
         else:
             k = Key(private_key_wallet)
     except:
-        wallet_state_add_label["text"] = "Неправильный номер кошелька"
+        if lang_var == 0:
+            wallet_state_add_label["text"] = "Неправильный номер кошелька"
+        else:
+            wallet_state_add_label["text"] = "Incorrect key wallet"
         return
 
     print('Public address:', k.address)
     public_addres_wallet = k.address
-    public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
-    private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
-
-    wallet_state_add_label["text"] = "Кошелек добавлен"
+    if lang_var == 0:
+        public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
+        private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
+    else:
+        public_key_label["text"] = "Public wallet key " + str(public_addres_wallet) 
+        private_key_label["text"] =  "Private wallet key " + str(private_key_wallet) 
+    if lang_var == 0:
+        wallet_state_add_label["text"] = "Кошелек добавлен"
+    else:
+        wallet_state_add_label["text"] = "Wallet commit"
 
     newWallet.destroy()
 
@@ -298,12 +346,19 @@ def add_wallet():
 
     newWallet= Tk()
 
-    wallet_info_add_label = ttk.Label(newWallet, text = "Введите приватный номер кошелька")
+    if lang_var == 0:
+        wallet_info = "Введите приватный номер кошелька"
+        add_but = "Добавить"
+    else:
+        wallet_info = "Insert private key wallet"
+        add_but = "Add"      
+
+    wallet_info_add_label = ttk.Label(newWallet, text = wallet_info)
     wallet_info_add_label.pack()
     wallet_add_entry = Entry( master = newWallet, width=50)
     wallet_add_entry.pack()
 
-    wallet_send_button = ttk.Button(newWallet, text = "Добавить", command=set_new_wallet)
+    wallet_send_button = ttk.Button(newWallet, text = add_but, command=set_new_wallet)
     wallet_send_button.pack()   
 
     wallet_state_add_label = ttk.Label(newWallet)
@@ -323,10 +378,30 @@ def create_wallet():
     private_key_wallet = k.to_wif()
     public_addres_wallet = k.address
 
-    public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
-    private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
+    if lang_var == 0:
+        public_key_label["text"] = "Публичный номер кошелька " + str(public_addres_wallet) 
+        private_key_label["text"] =  "Приватный ключ кошелька " + str(private_key_wallet) 
+    else:
+        public_key_label["text"] = "Public wallet key " + str(public_addres_wallet) 
+        private_key_label["text"] =  "Private wallet key " + str(private_key_wallet) 
 
 
+def handle_update():
+    global ports, languages_var
+    ports = serial.tools.list_ports.comports(include_links=False)
+    languages_var = Variable(value=ports)
+    languages_listbox.delete(0, END)  #clear listbox
+    for filename in ports: #populate listbox again
+        languages_listbox.insert(END, filename)
+
+def handle_close():
+    global s
+    global state, lang_var
+    if lang_var == 0:
+        state.set("Отключенно")
+    else:
+        state.set("Disconnect")
+    s.close()
 
 
 def update_balance_thread():
@@ -356,6 +431,8 @@ def lang_click():
         public_key_label["text"] = "Public key "
         private_key_label["text"] = "Private key "
         connect_button.config(text="Connect")
+        update_button.config(text="Refresh")
+        close_button.config(text="Disconnect")
         balance_label["text"] = "Balance"
         update_balance_button.config(text="Update balance")
         pin_label["text"] = "Enter PIN"
@@ -378,6 +455,8 @@ def lang_click():
         public_key_label["text"] = "Публичный номер кошелька "
         private_key_label["text"] = "Приватный ключ кошелька "
         connect_button.config(text="Подключится")
+        update_button.config(text="Обновить")
+        close_button.config(text="Отключится")
         balance_label["text"] = "Баланс"
         update_balance_button.config(text="Обновить баланс")
         pin_label["text"] = "Введите ПИН"
@@ -432,6 +511,12 @@ languages_listbox.bind("<<ListboxSelect>>", selected)
 
 connect_button = ttk.Button(frame3, text="Подключится", command=handle_click)
 connect_button.pack(anchor=NW, fill=X, padx=5, pady=5)
+
+update_button = ttk.Button(frame3, text="Обновить", command=handle_update)
+update_button.pack(anchor=NW, fill=X, padx=5, pady=5)
+
+close_button = ttk.Button(frame3, text="Отключится", command=handle_close)
+close_button.pack(anchor=NW, fill=X, padx=5, pady=5)
 
 
 frame2 = ttk.Frame(master=root, width=100, height=100,)
