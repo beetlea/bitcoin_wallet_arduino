@@ -35,3 +35,24 @@ Watch straps 20mm
 
 4 Glue the screen with a thermal gun at the four corners of the rectangle of the lid. We insert the nuts into the lower holes, connect them to the computer and stitch them with a sketch from the wallet_flash folder. Attach the straps. It should turn out like this:
 <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/IMG_1641.JPG">
+
+
+<h2>Principle of operation</h2>
+Run the bitcoin_wallet.exe file in the bitcoin_wallet folder
+
+1 You can change language for English
+ <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/1.png">
+ 
+2 Connect your device to your computer and select the appropriate comport. Then click connect. The status bar should show “connected”, and the arduino display should show “START”.
+ <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/2.png">
+ 
+ 3 If you want to work in a test blockchain, leave a checkmark in the “Set blockchain” field. If you want to use a "True" blockchain, then check the box “True”
+ 
+ <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/3.png">
+ 4 To create a wallet, click the "Create Wallet" button, create a PIN code and click the "Save Wallet" button. The arduino display should show “SAVE” when successfully saving the wallet to the arduino memory
+
+<img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/4.png">
+   
+5 If you already have a wallet, or you want to save a newly created wallet, then click the add wallet button and paste the private key there. And then enter the pin code and click the "Load Wallet" button. If you forget the PIN code, then access to the wallet will be lost. You will have to manually select passwords. Loading a private wallet into memory does not require internet access.
+   <img src="https://github.com/beetlea/bitcoin_wallet_arduino/blob/master/photo/5.png">
+  
